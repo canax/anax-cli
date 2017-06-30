@@ -3,7 +3,7 @@
 # Anax CLI utility to work with Anax websites.
 #
 VERSION="\
-v1.0.x (2017-06-30)
+v1.0.0 (2017-06-30)
 "
 
 BADUSAGE="\
