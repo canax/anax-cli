@@ -23,14 +23,36 @@ Options:
     --output [format]   Set the output format, default is text.
 "
 
+# Color ouput
+RED=$(tput setaf 1)
+NORMAL=$(tput sgr0)
 
 
+
 #
+# Error while processing
 #
-#
-function anax-check
+function fail
 {
-    :
+    printf "%s\n" "${RED}[FAILED]${NORMAL} $*"
+    exit 2
+}
+
+
+
+#
+# Create a new site
+#
+function anax-create
+{
+    local dir=$ARGS
+
+    [[ ! $dir ]] && fail "Missing name of directory to create the site in, must be non-existing directory."
+
+    [ -e "$dir" ] && fail "The directory exists, use another path where a new directory can be created."
+
+    echo "Creating a new Anax site in directory '$dir'."
+    install -d "$dir" || echo "failed"
 }
 
 
@@ -50,14 +72,13 @@ while (( $# )); do
             exit 0
         ;;
 
-        # check)
-        #     COMMAND=$1
-        #     shift
-        #     URL=$( echo $1 | sed 's/[\/]*$//')
-        #     shift
-        # ;;
+        create)
+            COMMAND=$1
+            shift
+        ;;
 
         *)
+            [[ ! $COMMAND ]] && printf "%s\n%s" "Unknown option/command/argument '$1'." "$BADUSAGE" && exit 1
             ARGS+=("$1")
             shift
         ;;
@@ -67,8 +88,8 @@ done
 
 
 # Execute the command 
-if type -t linkchecker-"$COMMAND" | grep -q function; then
-    linkchecker-"$COMMAND"
+if type -t anax-"$COMMAND" | grep -q function; then
+    anax-"$COMMAND"
 else
     printf "%s" "$BADUSAGE"
     exit 1
