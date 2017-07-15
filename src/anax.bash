@@ -2,16 +2,29 @@
 #
 # Anax CLI utility to work with Anax websites.
 #
-VERSION="\
-v1.0.0 (2017-06-30)
-"
 
-BADUSAGE="\
-For an overview of the command, execute:
-anax --help
-"
+#
+# Globals (prefer none)
+# 
 
-USAGE="\
+
+
+#
+# Print out current version
+#
+version()
+{
+    printf "v1.0.1 (2017-07-15)\\n"
+}
+
+
+
+#
+# Print out how to use
+#
+usage()
+{
+    printf "\
 Utility to work with Anax web sites.
 Usage: anax [options] <command> [arguments]
 
@@ -22,19 +35,37 @@ Options:
     --help, -h          Show info on how to use it.
     --output [format]   Set the output format, default is text.
 "
+}
 
-# Color ouput
-RED=$(tput setaf 1)
-NORMAL=$(tput sgr0)
+
+
+#
+# Print out how to use
+#
+bad_usage()
+{
+    [[ $1 ]] && printf "%s\\n" "$1"
+
+    printf "\
+For an overview of the command, execute:
+anax --help
+"
+}
 
 
 
 #
 # Error while processing
 #
-function fail
+fail()
 {
-    printf "%s\n" "${RED}[FAILED]${NORMAL} $*"
+    local red
+    local normal
+
+    red=$(tput setaf 1)
+    normal=$(tput sgr0)
+
+    printf "%s %s\\n" "${red}[FAILED]${normal}" "$*"
     exit 2
 }
 
@@ -43,7 +74,7 @@ function fail
 #
 # Create a new site
 #
-function anax-create
+anax_create()
 {
     local dir=$ARGS
 
@@ -58,39 +89,50 @@ function anax-create
 
 
 #
-# Parse incoming options and arguments
-#
-while (( $# )); do
-    case "$1" in
-        --help | -h)
-            printf "%s" "$USAGE"
-            exit 0
-        ;;
+# Always have a main
+# 
+main()
+{
+    # Parse incoming options and arguments
+    while (( $# )); do
+        case "$1" in
+            --help | -h)
+                usage
+                exit 0
+            ;;
 
-        --version | -v)
-            printf "%s" "$VERSION"
-            exit 0
-        ;;
+            --version | -v)
+                version
+                exit 0
+            ;;
 
-        create)
-            COMMAND=$1
-            shift
-        ;;
+            create)
+                COMMAND=$1
+                shift
+            ;;
 
-        *)
-            [[ ! $COMMAND ]] && printf "%s\n%s" "Unknown option/command/argument '$1'." "$BADUSAGE" && exit 1
-            ARGS+=("$1")
-            shift
-        ;;
-    esac
-done
+            *)
+                if [[ ! $COMMAND ]]; then
+                    bad_usage "Unknown option/command/argument '$1'."
+                    exit 1
+                fi
+                ARGS+=("$1")
+                shift
+            ;;
+        esac
+    done
 
 
 
-# Execute the command 
-if type -t anax-"$COMMAND" | grep -q function; then
-    anax-"$COMMAND"
-else
-    printf "%s" "$BADUSAGE"
-    exit 1
-fi
+    # Execute the command 
+    if type -t anax_"$COMMAND" | grep -q function; then
+        anax_"$COMMAND"
+    else
+        bad_usage "Missing command."
+        exit 1
+    fi
+}
+
+
+
+main "$@"

@@ -20,12 +20,12 @@ TMP="/tmp/$$"
 
 ECHO="echo -e"
 ECHON="echo -n"
-MSG_DOING="\033[1;37;40m[dbwebb-cli install]\033[0m"
+MSG_DOING="\\033[1;37;40m[dbwebb-cli install]\\033[0m"
 #MSG_DONE="\033[0;30;42m[OK]\033[0m"
 MSG_DONE=""
-MSG_OK="\033[0;30;42m[SUCCESS]\033[0m"
-#MSG_WARNING="\033[43mWARNING\033[0m"
-MSG_FAILED="\033[0;37;41m[FAILED]\033[0m"
+MSG_OK="\\033[0;30;42m[SUCCESS]\\033[0m"
+#MSG_WARNING="\\033[43mWARNING\\033[0m"
+MSG_FAILED="\\033[0;37;41m[FAILED]\\033[0m"
 
 
 
@@ -35,7 +35,7 @@ MSG_FAILED="\033[0;37;41m[FAILED]\033[0m"
 function checkTool() {
     $ECHON "$1 "
     if ! hash "$1" 2> /dev/null; then
-        $ECHO "\n$MSG_FAILED Missing $1, install it $2"
+        $ECHO "\\n$MSG_FAILED Missing $1, install it $2"
         exit -1
     fi
 }
@@ -47,7 +47,7 @@ checkTool "ssh"    "using your packet manager."
 checkTool "rsync"  "using your packet manager."
 checkTool "git"    "https://dbwebb.se/labbmiljo/git"
 
-$ECHO "\n$MSG_DONE"
+$ECHO "\\n$MSG_DONE"
 
 
 

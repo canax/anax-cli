@@ -43,6 +43,7 @@ HELPTEXT = $(ECHO) "$(ACTION)--->" `egrep "^\# target: $(1) " $(THIS_MAKEFILE) |
 # Add local bin path for test tools
 #PATH := "./.bin:./vendor/bin:./node_modules/.bin:$(PATH)"
 #SHELL := env PATH=$(PATH) $(SHELL)
+BIN     := .bin
 PHPUNIT := .bin/phpunit
 PHPLOC 	:= .bin/phploc
 PHPCS   := .bin/phpcs
@@ -51,6 +52,7 @@ PHPMD   := .bin/phpmd
 PHPDOC  := .bin/phpdoc
 BEHAT   := .bin/behat
 SHELLCHECK := .bin/shellcheck
+BATS := $(BIN)/bats
 
 
 
@@ -100,7 +102,7 @@ check: check-tools-bash #check-tools-php
 
 # target: test               - Run all tests.
 .PHONY:  test
-test: shellcheck #phpunit phpcs phpmd phploc behat
+test: shellcheck bats #phpunit phpcs phpmd phploc behat
 	@$(call HELPTEXT,$@)
 	composer validate
 
@@ -250,7 +252,17 @@ behat:
 .PHONY: install-tools-bash
 install-tools-bash:
 	@$(call HELPTEXT,$@)
+	# Shellcheck
 	curl -s https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz | tar -xJ -C build/ && rm -f .bin/shellcheck && ln build/shellcheck-latest/shellcheck .bin/
+
+	# Bats
+	curl -Lso $(BIN)/bats-exec-suite https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-exec-suite
+	curl -Lso $(BIN)/bats-exec-test https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-exec-test
+	curl -Lso $(BIN)/bats-format-tap-stream https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-format-tap-stream
+	curl -Lso $(BIN)/bats-preprocess https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-preprocess
+	curl -Lso $(BATS) https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats
+	chmod 755 $(BIN)/bats*
+
 
 
 
@@ -259,6 +271,7 @@ install-tools-bash:
 check-tools-bash:
 	@$(call HELPTEXT,$@)
 	which $(SHELLCHECK) && $(SHELLCHECK) --version
+	which $(BATS) && $(BATS) --version
 
 
 
@@ -267,3 +280,11 @@ check-tools-bash:
 shellcheck:
 	@$(call HELPTEXT,$@)
 	$(SHELLCHECK) --shell=bash src/*.bash
+
+
+
+# target: bats               - Run bats for unit testing bash files.
+.PHONY: bats
+bats:
+	@$(call HELPTEXT,$@)
+	$(BATS) test/
