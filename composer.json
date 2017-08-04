@@ -15,5 +15,8 @@
     ],
     "support": {
         "issues": "https://github.com/canax/anax-cli/issues"
-    }
+    },
+    "bin": [
+        "src/anax.bash"
+    ]
 }
