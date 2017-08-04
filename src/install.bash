@@ -3,6 +3,7 @@
 # Download and install anax-cli.
 #
 # Execute as:
+# curl https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash | bash
 # bash -c "$(cat install.bash)"
 # bash -c "$(wget -qO- https://raw.githubusercontent.com/canax/anax-cli/master/release/latest/install)"
 #
