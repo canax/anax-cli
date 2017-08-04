@@ -1,12 +1,14 @@
 Revision history
 =================================
 
-v1.0.2* (2017-08-04)
+v1.0.2 (2017-08-04)
 ---------------------------------
 
+* Enabled create <dir> <template>.
 * Made installation procedure work.
 * Adding selfupdate.
-* Adding configdirectory.
+* Adding config directory.
+* Use composer to install binary.
 
 
 v1.0.1 (2017-07-15)

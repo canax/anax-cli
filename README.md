@@ -15,13 +15,13 @@ Install
 Download and install.
 
 ```bash
-$ curl https://raw.githubusercontent.com/canax/anax-cli/master/release/latest/install | bash
+curl https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash | bash
 ```
 
 Install using composer.
 
 ```bash
-$ composer require anax/anax-cli
+composer require anax/anax-cli
 ```
 
 

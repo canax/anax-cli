@@ -75,6 +75,24 @@ fail()
 
 
 #
+# Print confirmation, call with a prompt string or use a default
+#
+confirm()
+{
+    read -r -p "${1:-Are you sure? [yN]} "
+    case "${REPLY:-$2}" in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+
+
+#
 # Read the configuration if it exists
 #
 config_read()
@@ -116,15 +134,40 @@ anax_create()
 {
     local dir=${ARGS[0]}
     local template=${ARGS[1]}
+    local scaffold=
+    local external="https://raw.githubusercontent.com/canax/scaffold/master/scaffold"
 
     config_read
 
+    # Check dir 
     [[ ! $dir ]] && fail "Missing name of directory to create the site in, must be non-existing directory."
 
     [[ -e "$dir" && ! $FORCE ]] && fail "The directory '$dir' exists, use another dirname."
 
-    echo "Creating a new Anax site in directory '$dir' using template '$template'."
-    install -d "$dir" || echo "failed"
+    printf "Creating a new Anax site in directory '%s' using template '%s'.\\n" "$dir" "$template"
+
+    install -d "$dir" || fail "Could not create the directory '$dir'."
+
+    [[ ! $template ]] && fail "Missing template name to use." 
+
+    scaffold="$ANAX_CONFIG_DIR/scaffold/$template"
+    if [[ -d $scaffold ]]; then
+        printf "Found (and using) local scaffold template in:\\n%s\\n" "$scaffold"
+        rsync -a "$scaffold/" "$dir/"
+    else
+        printf "Using external template from:\\n%s\\n" "$external/$template"
+        local file="$template.tar.gz"
+        local source="$external/$file"
+        curl --silent --fail --output "$file" "$source" || fail "Failed downloading external template '$source'."
+        curl --silent --fail --output "$file.sha1" "$source.sha1" || fail "Failed downloading sha1 '$source.sha1'."
+        sha1sum -c "$file.sha1" || fail "Sha1 checksum did not match."
+        tar xzf $file -C "$dir" || fail "Could not read tar archive."
+        rm "$file" "$file.sha1"
+    fi
+
+    printf "Directory '$dir' is now scaffolded.\\n" "$dir"
+    ls -l "$dir"
+    confirm "Execute postprocessing by 'make scaffold-setup'? [Yn]" "Y" && cd "$dir" && make scaffold-setup
 }
 
 
