@@ -5,7 +5,8 @@
 # Execute as:
 # curl https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash | bash
 # bash -c "$(cat install.bash)"
-# bash -c "$(wget -qO- https://raw.githubusercontent.com/canax/anax-cli/master/release/latest/install)"
+# bash -c "$(curl -s https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash)"
+# bash -c "$(wget -qO- https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash)"
 #
 
 
@@ -43,6 +44,8 @@ function checkTool() {
 
 $ECHO "$MSG_DOING Checking precondition..."
 
+checkTool "curl"      "using your packet manager."
+checkTool "rsync"     "using your packet manager."
 checkTool "git"       "https://dbwebb.se/labbmiljo/git"
 checkTool "php"       "https://dbwebb.se/labbmiljo/php-i-pathen"
 checkTool "composer"  "https://dbwebb.se/labbmiljo/composer"
