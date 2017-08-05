@@ -25,7 +25,8 @@ version()
 usage()
 {
     printf "\
-Utility to work with Anax web sites.
+Utility to work with Anax web sites. Read more on:
+https://dbwebb.se/anax-cli/
 Usage: anax [options] <command> [arguments]
 
 Command:
