@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.0.2* (2017-08-04)\\n"
+    printf "v1.0.3 (2017-08-05)\\n"
 }
 
 
@@ -29,6 +29,7 @@ Utility to work with Anax web sites.
 Usage: anax [options] <command> [arguments]
 
 Command:
+ check                    Check and display details on local environment.
  config                   Create base for configuration in \$HOME/.anax/.
  create <dir> <template>  Create a new site in dir using a template.
  selfupdate               Update to latest version.
@@ -113,6 +114,33 @@ config_create()
     install -d "$ANAX_CONFIG_DIR/scaffold" || fail "Could not create configuration dir: '$ANAX_CONFIG_DIR'"
     touch "$ANAX_CONFIG_DIR/config" || fail "Could not create configuration file: '$ANAX_CONFIG_DIR/config'"
     ls -l "$ANAX_CONFIG_DIR"
+}
+
+
+
+#
+# Check details on local environment
+#
+anax_check()
+{
+    local red
+    local normal
+
+    red=$(tput setaf 1)
+    normal=$(tput sgr0)
+
+    echo "### Checking system" && uname -a
+    for tool in bash curl rsync git php composer make; do
+        printf "\\n### Checking %s\\n" "$tool"
+        which $tool && $tool --version || printf "%s %s\\n" "${red}[MISSING]${normal}" "$tool"
+    done
+
+    printf "\\n### Checking config dir '%s'\\n" "$ANAX_CONFIG_DIR"
+    if [[ -d $ANAX_CONFIG_DIR ]]; then
+        ls -l "$ANAX_CONFIG_DIR"
+    else
+        printf "%s %s\\n" "${red}[MISSING]${normal} config directory, but you can do without it."
+    fi
 }
 
 
@@ -205,6 +233,7 @@ main()
                 shift
             ;;
 
+            check       | \
             create      | \
             config      | \
             selfupdate    )

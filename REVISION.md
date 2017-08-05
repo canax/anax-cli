@@ -1,6 +1,13 @@
 Revision history
 =================================
 
+v1.0.3 (2017-08-05)
+---------------------------------
+
+* Install checking for rsync and curl.
+* Adding anax check to check local environment.
+
+
 v1.0.2 (2017-08-04)
 ---------------------------------
 
