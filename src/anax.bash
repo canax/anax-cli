@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.0.3 (2017-08-05)\\n"
+    printf "v1.0.4 (2017-08-05)\\n"
 }
 
 
@@ -140,7 +140,7 @@ anax_check()
     if [[ -d $ANAX_CONFIG_DIR ]]; then
         ls -l "$ANAX_CONFIG_DIR"
     else
-        printf "%s %s\\n" "${red}[MISSING]${normal} config directory, but you can do without it."
+        printf "%s config directory, but you can do without it.\\n" "${red}[MISSING]${normal} "
     fi
 }
 
@@ -171,7 +171,7 @@ anax_create()
     # Check dir 
     [[ ! $dir ]] && fail "Missing name of directory to create the site in, must be non-existing directory."
 
-    [[ -e "$dir" && ! $FORCE ]] && fail "The directory '$dir' exists, use another dirname."
+    [[ -d "$dir" && ! $FORCE ]] && fail "The directory '$dir' exists, use another dirname."
 
     printf "Creating a new Anax site in directory '%s' using template '%s'.\\n" "$dir" "$template"
 
@@ -180,7 +180,7 @@ anax_create()
     [[ ! $template ]] && fail "Missing template name to use." 
 
     scaffold="$ANAX_CONFIG_DIR/scaffold/$template"
-    if [[ -d $scaffold ]]; then
+    if [[ -e $scaffold ]]; then
         printf "Found (and using) local scaffold template in:\\n%s\\n" "$scaffold"
         rsync -a "$scaffold/" "$dir/"
     else
@@ -190,13 +190,20 @@ anax_create()
         curl --silent --fail --output "$file" "$source" || fail "Failed downloading external template '$source'."
         curl --silent --fail --output "$file.sha1" "$source.sha1" || fail "Failed downloading sha1 '$source.sha1'."
         sha1sum -c "$file.sha1" || fail "Sha1 checksum did not match."
-        tar xzf $file -C "$dir" || fail "Could not read tar archive."
+        tar xzf "$file" -C "$dir" || fail "Could not read tar archive."
         rm "$file" "$file.sha1"
     fi
 
-    printf "Directory '$dir' is now scaffolded.\\n" "$dir"
+    local postprocess=".scaffold/$template.bash"
+    if [[ -f $dir/$postprocess ]]; then
+        # shellcheck source=/dev/null
+        confirm "Execute postprocessing in '$dir/$postprocess'? [Yn]" "Y" && pushd "$dir" &> /dev/null && bash < "./$postprocess" && popd &> /dev/null
+    else
+        printf "Skipping postprocess, script not found.\\n"
+    fi
+
+    printf "Directory '%s' is now scaffolded.\\n" "$dir"
     ls -l "$dir"
-    confirm "Execute postprocessing by 'make scaffold-setup'? [Yn]" "Y" && cd "$dir" && make scaffold-setup
 }
 
 

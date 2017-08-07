@@ -1,10 +1,11 @@
 Revision history
 =================================
 
-v1.0.4* (2017-08-05)
+v1.0.4 (2017-08-07)
 ---------------------------------
 
 * Adding link to the online manual.
+* Made create <dir> <template> work.
 
 
 v1.0.3 (2017-08-05)
