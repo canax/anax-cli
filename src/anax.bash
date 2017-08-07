@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.0.4 (2017-08-05)\\n"
+    printf "v1.0.5 (2017-08-07)\\n"
 }
 
 
@@ -197,7 +197,11 @@ anax_create()
     local postprocess=".scaffold/$template.bash"
     if [[ -f $dir/$postprocess ]]; then
         # shellcheck source=/dev/null
-        confirm "Execute postprocessing in '$dir/$postprocess'? [Yn]" "Y" && pushd "$dir" &> /dev/null && bash < "./$postprocess" && popd &> /dev/null
+        if confirm "Execute postprocessing in '$dir/$postprocess'? [Yn]" "Y"; then
+            pushd "$dir" &> /dev/null || fail "Could not move into dir '$dir'"
+            bash < "./$postprocess" || fail "Error occured when executing '$postprocess'"
+            popd &> /dev/null || fail "Failed moving back to original directory"
+        fi
     else
         printf "Skipping postprocess, script not found.\\n"
     fi
