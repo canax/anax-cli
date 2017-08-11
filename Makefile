@@ -287,4 +287,4 @@ shellcheck:
 .PHONY: bats
 bats:
 	@$(call HELPTEXT,$@)
-	$(BATS) test/
+	$(BATS) bats/
