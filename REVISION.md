@@ -2,9 +2,10 @@ Revision history
 =================================
 
 
-v1.0.6* (2017-08-11)
+v1.1.0 (2017-08-11)
 ---------------------------------
 
+* Change postfix of postprocessing file, removing .bash.
 * Rename test dir to bats/.
 * Add function for input data from user.
 * Add anax develop to ease test and development.

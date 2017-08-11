@@ -208,13 +208,13 @@ anax_create()
         rm "$file" "$file.sha1"
     fi
 
-    local postprocess=".scaffold/$template.bash"
+    local postprocess=".scaffold/$template"
     if [[ -f $dir/$postprocess ]]; then
         # shellcheck source=/dev/null
         if confirm "Execute postprocessing in '$dir/$postprocess'? [Yn]" "Y"; then
-            pushd "$dir" &> /dev/null || fail "Could not move into dir '$dir'"
-            bash < "./$postprocess" || fail "Error occured when executing '$postprocess'"
-            popd &> /dev/null || fail "Failed moving back to original directory"
+            local commandline=(./$postprocess)
+            ( cd "$dir" && "${commandline[@]}" ) \
+                || fail "Error occured when executing '$postprocess'"
         fi
     else
         printf "Skipping postprocess, script not found.\\n"
