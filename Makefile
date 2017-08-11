@@ -1,10 +1,6 @@
-#
-#
-#
-
 # ------------------------------------------------------------------------
 #
-# Generel stuff
+# General stuff
 #
 
 # Detect OS
@@ -39,19 +35,15 @@ HELPTEXT = $(ECHO) "$(ACTION)--->" `egrep "^\# target: $(1) " $(THIS_MAKEFILE) |
 #
 # Specifics
 #
-
-# Add local bin path for test tools
-#PATH := "./.bin:./vendor/bin:./node_modules/.bin:$(PATH)"
-#SHELL := env PATH=$(PATH) $(SHELL)
 BIN     := .bin
-PHPUNIT := .bin/phpunit
-PHPLOC 	:= .bin/phploc
-PHPCS   := .bin/phpcs
-PHPCBF  := .bin/phpcbf
-PHPMD   := .bin/phpmd
-PHPDOC  := .bin/phpdoc
-BEHAT   := .bin/behat
-SHELLCHECK := .bin/shellcheck
+PHPUNIT := $(BIN)/phpunit
+PHPLOC 	:= $(BIN)/phploc
+PHPCS   := $(BIN)/phpcs
+PHPCBF  := $(BIN)/phpcbf
+PHPMD   := $(BIN)/phpmd
+PHPDOC  := $(BIN)/phpdoc
+BEHAT   := $(BIN)/behat
+SHELLCHECK := $(BIN)/shellcheck
 BATS := $(BIN)/bats
 
 
@@ -78,18 +70,26 @@ prepare:
 
 
 # target: clean              - Removes generated files and directories.
-.PHONY:  clean
+.PHONY: clean
 clean:
 	@$(call HELPTEXT,$@)
 	rm -rf build
 
 
 
+# target: clean-cache        - Clean the cache.
+.PHONY:  clean-cache
+clean-cache:
+	@$(call HELPTEXT,$@)
+	rm -rf cache/*/*
+
+
+
 # target: clean-all          - Removes generated files and directories.
 .PHONY:  clean-all
-clean-all:
+clean-all: clean clean-cache
 	@$(call HELPTEXT,$@)
-	rm -rf .bin build vendor composer.lock
+	rm -rf .bin vendor
 
 
 
@@ -102,7 +102,7 @@ check: check-tools-bash #check-tools-php
 
 # target: test               - Run all tests.
 .PHONY:  test
-test: shellcheck bats #phpunit phpcs phpmd phploc behat
+test: shellcheck bats #phpunit phpcs phpmd phploc behat 
 	@$(call HELPTEXT,$@)
 	composer validate
 
@@ -117,7 +117,7 @@ doc: phpdoc
 
 # target: build              - Do all build
 .PHONY:  build
-build: test doc #less-compile less-minify js-minify
+build: test doc #theme less-compile less-minify js-minify
 	@$(call HELPTEXT,$@)
 
 
@@ -133,7 +133,7 @@ install: prepare install-tools-bash #install-tools-php
 .PHONY:  update
 update:
 	@$(call HELPTEXT,$@)
-	git pull
+	[ ! -d .git ] || git pull
 	composer update
 
 
@@ -154,7 +154,8 @@ tag-prepare:
 .PHONY: install-tools-php
 install-tools-php:
 	@$(call HELPTEXT,$@)
-	curl -Lso $(PHPDOC) https://www.phpdoc.org/phpDocumentor.phar && chmod 755 $(PHPDOC)
+	#curl -Lso $(PHPDOC) https://www.phpdoc.org/phpDocumentor.phar && chmod 755 $(PHPDOC)
+	curl -Lso $(PHPDOC) https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.9.0/phpDocumentor.phar && chmod 755 $(PHPDOC)
 
 	curl -Lso $(PHPCS) https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar && chmod 755 $(PHPCS)
 
@@ -162,14 +163,13 @@ install-tools-php:
 
 	curl -Lso $(PHPMD) http://static.phpmd.org/php/latest/phpmd.phar && chmod 755 $(PHPMD)
 
-	curl -Lso $(PHPUNIT) https://phar.phpunit.de/phpunit-5.7.9.phar && chmod 755 $(PHPUNIT)
-
 	curl -Lso $(PHPLOC) https://phar.phpunit.de/phploc.phar && chmod 755 $(PHPLOC)
 
 	curl -Lso $(BEHAT) https://github.com/Behat/Behat/releases/download/v3.3.0/behat.phar && chmod 755 $(BEHAT)
 
-	composer install
+	curl -Lso $(PHPUNIT) https://phar.phpunit.de/phpunit-5.7.9.phar && chmod 755 $(PHPUNIT)
 
+	[ ! -f composer.json ] || composer install
 
 
 
@@ -177,6 +177,7 @@ install-tools-php:
 .PHONY: check-tools-php
 check-tools-php:
 	@$(call HELPTEXT,$@)
+	php --version && echo
 	which $(PHPUNIT) && $(PHPUNIT) --version
 	which $(PHPLOC) && $(PHPLOC) --version
 	which $(PHPCS) && $(PHPCS) --version && echo
@@ -191,7 +192,7 @@ check-tools-php:
 .PHONY: phpunit
 phpunit: prepare
 	@$(call HELPTEXT,$@)
-	[ ! -f .phpunit.xml ] || $(PHPUNIT) --configuration .phpunit.xml
+	[ ! -d "test" ] || $(PHPUNIT) --configuration .phpunit.xml
 
 
 
@@ -207,7 +208,11 @@ phpcs: prepare
 .PHONY: phpcbf
 phpcbf:
 	@$(call HELPTEXT,$@)
+ifneq ($(wildcard test),)
 	[ ! -f .phpcs.xml ] || $(PHPCBF) --standard=.phpcs.xml
+else
+	[ ! -f .phpcs.xml ] || $(PHPCBF) --standard=.phpcs.xml src
+endif
 
 
 
@@ -231,7 +236,7 @@ phploc: prepare
 .PHONY: phpdoc
 phpdoc:
 	@$(call HELPTEXT,$@)
-	[ ! -f .phpdoc.xml ] || $(PHPDOC) --config=.phpdoc.xml
+	[ ! -d doc ] || $(PHPDOC) --config=.phpdoc.xml
 
 
 
@@ -240,7 +245,6 @@ phpdoc:
 behat:
 	@$(call HELPTEXT,$@)
 	[ ! -d features ] || $(BEHAT)
-
 
 
 # ------------------------------------------------------------------------
@@ -265,7 +269,6 @@ install-tools-bash:
 
 
 
-
 # target: check-tools-bash   - Check versions of Bash tools.
 .PHONY: check-tools-bash
 check-tools-bash:
@@ -279,7 +282,7 @@ check-tools-bash:
 .PHONY: shellcheck
 shellcheck:
 	@$(call HELPTEXT,$@)
-	$(SHELLCHECK) --shell=bash src/*.bash
+	[ ! -f src/*.bash ] || $(SHELLCHECK) --shell=bash src/*.bash
 
 
 
@@ -287,4 +290,53 @@ shellcheck:
 .PHONY: bats
 bats:
 	@$(call HELPTEXT,$@)
-	$(BATS) bats/
+	[ ! -d bats ] || $(BATS) bats/
+
+
+
+# ------------------------------------------------------------------------
+#
+# Theme
+#
+# target: theme              - Do make build install in theme/ if available.
+.PHONY: theme
+theme:
+	@$(call HELPTEXT,$@)
+	[ ! -d theme ] || $(MAKE) --directory=theme build install
+	#[ ! -d theme ] || ( cd theme && make build install )
+
+
+
+# ------------------------------------------------------------------------
+#
+# Cimage
+#
+
+define CIMAGE_CONFIG
+<?php
+return [
+    "mode"         => "development",
+    "image_path"   =>  __DIR__ . "/../img/",
+    "cache_path"   =>  __DIR__ . "/../../cache/cimage/",
+    "autoloader"   =>  __DIR__ . "/../../vendor/autoload.php",
+];
+endef
+export CIMAGE_CONFIG
+
+# target: cimage-update           - Install/update Cimage to latest version.
+.PHONY: cimage-update
+cimage-update:
+	@$(call HELPTEXT,$@)
+	composer require mos/cimage
+	install -d htdocs/cimage cache/cimage
+	chmod 777 cache/cimage
+	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
+	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
+	touch htdocs/cimage/img_config.php
+
+# target: cimage-config-create    - Create configfile for Cimage.
+.PHONY: cimage-config-create
+cimage-config-create:
+	@$(call HELPTEXT,$@)
+	$(ECHO) "$$CIMAGE_CONFIG" | bash -c 'cat > htdocs/cimage/img_config.php'
+	cat htdocs/cimage/img_config.php
