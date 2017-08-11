@@ -6,6 +6,8 @@ v1.0.6* (2017-08-11)
 ---------------------------------
 
 * Rename test dir to bats/.
+* Add function for input data from user.
+* Add anax develop to ease test and development.
 
 
 v1.0.5 (2017-08-07)

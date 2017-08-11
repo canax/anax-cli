@@ -77,7 +77,9 @@ fail()
 
 
 #
-# Print confirmation, call with a prompt string or use a default
+# Print confirmation message with default values.
+# arg1: The message to display or use default.
+# arg2: The default value for the response.
 #
 confirm()
 {
@@ -90,6 +92,19 @@ confirm()
             false
             ;;
     esac
+}
+
+
+
+#
+# Read input from user supporting a default value for reponse.
+# arg1: The message to display.
+# arg2: The default value.
+#
+input()
+{
+    read -r -p "$1 [$2]: "
+    echo "${REPLY:-$2}"
 }
 
 
@@ -168,7 +183,6 @@ anax_create()
 
     config_read
 
-    # Check dir 
     [[ ! $dir ]] && fail "Missing name of directory to create the site in, must be non-existing directory."
 
     [[ -d "$dir" && ! $FORCE ]] && fail "The directory '$dir' exists, use another dirname."
@@ -223,6 +237,16 @@ anax_selfupdate()
 
 
 #
+# For development and test.
+#
+anax_develop()
+{
+    :
+}
+
+
+
+#
 # Always have a main
 # 
 main()
@@ -248,6 +272,7 @@ main()
             check       | \
             create      | \
             config      | \
+            develop     | \
             selfupdate    )
                 COMMAND=$1
                 shift
