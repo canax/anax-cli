@@ -2,6 +2,14 @@ Revision history
 =================================
 
 
+v1.1.1 (2017-08-12)
+---------------------------------
+
+* Codeformatting for readability.
+* Make anax_selfupdate more resilient to errors.
+* Allow anax_create even when sha1sum is not available.
+
+
 v1.1.0 (2017-08-11)
 ---------------------------------
 

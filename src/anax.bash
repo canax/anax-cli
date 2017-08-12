@@ -77,6 +77,19 @@ fail()
 
 
 #
+# Check if command is installed
+# arg1: The command
+#
+function has_command() {
+    if ! hash "$1" 2> /dev/null; then
+        return 1
+    fi
+    return 0
+}
+
+
+
+#
 # Print confirmation message with default values.
 # arg1: The message to display or use default.
 # arg2: The default value for the response.
@@ -127,8 +140,10 @@ config_read()
 #
 config_create()
 {
-    install -d "$ANAX_CONFIG_DIR/scaffold" || fail "Could not create configuration dir: '$ANAX_CONFIG_DIR'"
-    touch "$ANAX_CONFIG_DIR/config" || fail "Could not create configuration file: '$ANAX_CONFIG_DIR/config'"
+    install -d "$ANAX_CONFIG_DIR/scaffold" \
+        || fail "Could not create configuration dir: '$ANAX_CONFIG_DIR'"
+    touch "$ANAX_CONFIG_DIR/config" \
+        || fail "Could not create configuration file: '$ANAX_CONFIG_DIR/config'"
     ls -l "$ANAX_CONFIG_DIR"
 }
 
@@ -148,7 +163,8 @@ anax_check()
     echo "### Checking system" && uname -a
     for tool in bash curl rsync git php composer make; do
         printf "\\n### Checking %s\\n" "$tool"
-        which $tool && $tool --version || printf "%s %s\\n" "${red}[MISSING]${normal}" "$tool"
+        which $tool && $tool --version \
+            || printf "%s %s\\n" "${red}[MISSING]${normal}" "$tool"
     done
 
     printf "\\n### Checking config dir '%s'\\n" "$ANAX_CONFIG_DIR"
@@ -183,15 +199,19 @@ anax_create()
 
     config_read
 
-    [[ ! $dir ]] && fail "Missing name of directory to create the site in, must be non-existing directory."
+    [[ ! $dir ]] \
+        && fail "Missing name of directory to create the site in, must be non-existing directory."
 
-    [[ -d "$dir" && ! $FORCE ]] && fail "The directory '$dir' exists, use another dirname."
+    [[ -d "$dir" && ! $FORCE ]] \
+        && fail "The directory '$dir' exists, use another dirname."
 
     printf "Creating a new Anax site in directory '%s' using template '%s'.\\n" "$dir" "$template"
 
-    install -d "$dir" || fail "Could not create the directory '$dir'."
+    install -d "$dir" \
+        || fail "Could not create the directory '$dir'."
 
-    [[ ! $template ]] && fail "Missing template name to use." 
+    [[ ! $template ]] \
+        && fail "Missing template name to use." 
 
     scaffold="$ANAX_CONFIG_DIR/scaffold/$template"
     if [[ -e $scaffold ]]; then
@@ -201,10 +221,18 @@ anax_create()
         printf "Using external template from:\\n%s\\n" "$external/$template"
         local file="$template.tar.gz"
         local source="$external/$file"
-        curl --silent --fail --output "$file" "$source" || fail "Failed downloading external template '$source'."
-        curl --silent --fail --output "$file.sha1" "$source.sha1" || fail "Failed downloading sha1 '$source.sha1'."
-        sha1sum -c "$file.sha1" || fail "Sha1 checksum did not match."
-        tar xzf "$file" -C "$dir" || fail "Could not read tar archive."
+        curl --silent --fail --output "$file" "$source" \
+            || fail "Failed downloading external template '$source'."
+        curl --silent --fail --output "$file.sha1" "$source.sha1" \
+            || fail "Failed downloading sha1 '$source.sha1'."
+
+        if has_command "sha1sum"; then
+            sha1sum -c "$file.sha1" \
+                || fail "Sha1 checksum did not match."
+        fi
+
+        tar xzf "$file" -C "$dir" \
+            || fail "Could not read tar archive."
         rm "$file" "$file.sha1"
     fi
 
@@ -231,7 +259,15 @@ anax_create()
 #
 anax_selfupdate()
 {
-    curl --silent https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash | bash
+    local tmp="/tmp/anax.$$"
+    local url="https://raw.githubusercontent.com/canax/anax-cli/master/src/install.bash"
+
+    if ! curl --fail --silent "$url" > "$tmp"; then
+        rm -f "$tmp"
+        fail "Could not download installations program. You need curl and a network connection."
+    fi
+    bash < "$tmp"
+    rm -f "$tmp"
 }
 
 
