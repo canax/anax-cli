@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.1.2 (2017-08-12)\\n"
+    printf "v1.1.4 (2017-08-31)\\n"
 }
 
 
