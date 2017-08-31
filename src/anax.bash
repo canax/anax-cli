@@ -240,7 +240,7 @@ anax_create()
     if [[ -f $dir/$postprocess ]]; then
         # shellcheck source=/dev/null
         if confirm "Execute postprocessing in '$dir/$postprocess'? [Yn]" "Y"; then
-            local commandline=(./$postprocess)
+            local commandline=( "./$postprocess" )
             ( cd "$dir" && "${commandline[@]}" ) \
                 || fail "Error occured when executing '$postprocess'"
         fi
