@@ -2,13 +2,8 @@ Revision history
 =================================
 
 
+v1.1.5 (2017-08-31)
 v1.1.4 (2017-08-31)
----------------------------------
-
-* Update version number.
-
-
-v1.1.3 (2017-08-31)
 ---------------------------------
 
 * Fix code validation regarding spaces in filename.
