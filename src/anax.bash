@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.1.5 (2017-08-31)\\n"
+    printf "v1.1.6 (2018-03-14)\\n"
 }
 
 
@@ -33,6 +33,8 @@ Command:
  check                    Check and display details on local environment.
  config                   Create base for configuration in \$HOME/.anax/.
  create <dir> <template>  Create a new site in dir using a template.
+ list                     List available templates for scaffolding from.
+ list <template>          List details on specific scaffolding template.
  selfupdate               Update to latest version.
 
 Options:
@@ -163,7 +165,7 @@ anax_check()
     echo "### Checking system" && uname -a
     for tool in bash curl rsync git php composer make; do
         printf "\\n### Checking %s\\n" "$tool"
-        which $tool && $tool --version \
+        command -v $tool && $tool --version \
             || printf "%s %s\\n" "${red}[MISSING]${normal}" "$tool"
     done
 
@@ -255,6 +257,32 @@ anax_create()
 
 
 #
+# List available scaffold templates, or more info on specific template.
+#
+anax_list()
+{
+    local target=${ARGS[0]}
+    local tmp="/tmp/anax.$$"
+    local url="https://raw.githubusercontent.com/canax/scaffold/master/doc/list.txt"
+
+    if [ "$target" ]; then
+        url="https://raw.githubusercontent.com/canax/scaffold/master/doc/$target.txt"
+        if ! curl --fail --silent "$url" > "$tmp"; then
+            rm -f "$tmp"
+            fail "Could not download list file. You need curl and a network connection."
+        fi
+    elif ! curl --fail --silent "$url" > "$tmp"; then
+        rm -f "$tmp"
+        fail "Could not download list file. You need curl and a network connection."
+    fi
+
+    cat "$tmp"
+    rm -f "$tmp"
+}
+
+
+
+#
 # Selfupdate to latest version.
 #
 anax_selfupdate()
@@ -309,6 +337,7 @@ main()
             create      | \
             config      | \
             develop     | \
+            list        | \
             selfupdate    )
                 COMMAND=$1
                 shift
