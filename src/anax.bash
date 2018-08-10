@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.1.7 (2018-03-14)\\n"
+    printf "v1.1.8 (2018-08-10)\\n"
 }
 
 
@@ -240,8 +240,11 @@ anax_create()
 
     local postprocess=".scaffold/$template"
     local postprocess1=".scaffold/postprocess.bash"
-    if [[ -f $dir/$postprocess1 ]]; then
-        # Slowly move to rename all postprocessingscript
+    local postprocess2=".anax/scaffold/postprocess.bash"
+    # Slowly move to rename all postprocessingscript
+    if [[ -f $dir/$postprocess2 ]]; then
+        postprocess="$postprocess2"
+    elif [[ -f $dir/$postprocess1 ]]; then
         postprocess="$postprocess1"
     fi
 
