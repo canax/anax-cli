@@ -2,6 +2,13 @@ Revision history
 =================================
 
 
+v1.1.9 (2018-09-26)
+---------------------------------
+
+* Do not prevent installing the tool when the prerequiesites is unavailable.
+
+
+
 v1.1.8 (2018-08-10)
 ---------------------------------
 

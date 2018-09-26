@@ -37,8 +37,8 @@ MSG_FAILED="\\033[0;37;41m[FAILED]\\033[0m"
 function checkTool() {
     $ECHON "$1 "
     if ! hash "$1" 2> /dev/null; then
-        $ECHO "\\n$MSG_FAILED Missing $1, install it $2"
-        exit -1
+        $ECHO "\\n$MSG_FAILED Missing $1, you might need to install it $2"
+        #exit -1
     fi
 }
 
