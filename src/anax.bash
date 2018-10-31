@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.1.10 (2018-09-26)\\n"
+    printf "v1.1.11 (2018-10-31)\\n"
 }
 
 
@@ -33,9 +33,11 @@ Command:
  check                    Check and display details on local environment.
  config                   Create base for configuration in \$HOME/.anax/.
  create <dir> <template>  Create a new site in dir using a template.
+ help                     Show info on how to use it.
  list                     List available templates for scaffolding from.
  list <template>          List details on specific scaffolding template.
  selfupdate               Update to latest version.
+ version                  Show info on how to use it.
 
 Options:
  --help, -h          Show info on how to use it.
@@ -327,12 +329,12 @@ main()
     # Parse incoming options and arguments
     while (( $# )); do
         case "$1" in
-            --help | -h)
+            --help | -h | help)
                 usage
                 exit 0
             ;;
 
-            --version | -v)
+            --version | -v | version)
                 version
                 exit 0
             ;;
