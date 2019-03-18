@@ -7,6 +7,7 @@ v1.1.* (2018-11-02)
 ---------------------------------
 
 * Update text for usage in README.
+* Update text in error message when create dir exists.
 
 
 

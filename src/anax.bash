@@ -207,7 +207,7 @@ anax_create()
         && fail "Missing name of directory to create the site in, must be non-existing directory."
 
     [[ -d "$dir" && ! $FORCE ]] \
-        && fail "The directory '$dir' exists, use another dirname."
+        && fail "The directory '$dir' exists, use another dirname, remove the dir or us --force, -f to overwrite it."
 
     printf "Creating a new Anax site in directory '%s' using template '%s'.\\n" "$dir" "$template"
 
