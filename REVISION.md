@@ -9,6 +9,7 @@ v1.2.0 (2019-03-19)
 * Update text for usage in README.
 * Update text in error message when create dir exists.
 * Update code for tests, due to code validation issues.
+* Upgrade circleci to v2.
 
 
 
