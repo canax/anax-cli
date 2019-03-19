@@ -282,7 +282,9 @@ check-tools-bash:
 .PHONY: shellcheck
 shellcheck:
 	@$(call HELPTEXT,$@)
-	[ ! -f src/*.bash ] || $(SHELLCHECK) --shell=bash src/*.bash
+ifneq ("$(wildcard src/*.bash)", "")
+	$(SHELLCHECK) --shell=bash src/*.bash
+endif
 
 
 

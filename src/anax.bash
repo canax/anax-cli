@@ -14,7 +14,7 @@ readonly ANAX_CONFIG_DIR="$HOME/.anax"
 #
 version()
 {
-    printf "v1.1.11 (2018-10-31)\\n"
+    printf "v1.2.0 (2019-03-19)\\n"
 }
 
 
@@ -53,7 +53,7 @@ Options:
 #
 bad_usage()
 {
-    [[ $1 ]] && printf "%s\\n" "$1"
+    [[ -n $1 ]] && printf "%s\\n" "$1"
 
     printf "\
 For an overview of the command, execute:
@@ -203,10 +203,10 @@ anax_create()
 
     config_read
 
-    [[ ! $dir ]] \
+    [[ -z $dir ]] \
         && fail "Missing name of directory to create the site in, must be non-existing directory."
 
-    [[ -d "$dir" && ! $FORCE ]] \
+    [[ -d $dir && -z $FORCE ]] \
         && fail "The directory '$dir' exists, use another dirname, remove the dir or us --force, -f to overwrite it."
 
     printf "Creating a new Anax site in directory '%s' using template '%s'.\\n" "$dir" "$template"
@@ -214,7 +214,7 @@ anax_create()
     install -d "$dir" \
         || fail "Could not create the directory '$dir'."
 
-    [[ ! $template ]] \
+    [[ -z $template ]] \
         && fail "Missing template name to use." 
 
     scaffold="$ANAX_CONFIG_DIR/scaffold/$template"
@@ -276,7 +276,7 @@ anax_list()
     local tmp="/tmp/anax.$$"
     local url="https://raw.githubusercontent.com/canax/scaffold/master/doc/list.txt"
 
-    if [ "$target" ]; then
+    if [[ -n $target ]]; then
         url="https://raw.githubusercontent.com/canax/scaffold/master/doc/$target.txt"
         if ! curl --fail --silent "$url" > "$tmp"; then
             rm -f "$tmp"
@@ -355,7 +355,7 @@ main()
             ;;
 
             *)
-                if [[ ! $COMMAND ]]; then
+                if [[ -z $COMMAND ]]; then
                     bad_usage "Unknown option/command/argument '$1'."
                     exit 1
                 fi
